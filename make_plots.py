@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 import glob
 from cmPong import cmPong
 from matplotlib.mlab import find
+import bisect
 
 # mpl.rcParams['text.usetex'] = True
 mpl.rcParams.update({'font.size': 16})
@@ -46,13 +47,38 @@ endtime = netCDF.date2num(datetime(year, 10, 1, 12, 0, 0), units)
 dt = m.variables['ocean_time'][1] - m.variables['ocean_time'][0] # 4 hours in seconds
 ts = np.arange(starttime, endtime, dt)
 itshift = find(starttime==m.variables['ocean_time'][:]) # shift to get to the right place in model output
-dates = netCDF.num2date(m.variables['ocean_time'][:], units)
+datesModel = netCDF.num2date(m.variables['ocean_time'][:], units)
+
+plotdates = netCDF.num2date(ts, units)
 
 # Colormap for model output
 levels = (37-np.exp(np.linspace(0,np.log(36.), 10)))[::-1]-1 # log for salinity
 cmap = cmPong.salinity('YlGnBu_r', levels)
 ilevels = [0,1,2,3,4,5,8] # which levels to label
 ticks = [int(tick) for tick in levels[ilevels]] # plot ticks
+##
+
+## Wind forcing ##
+w = netCDF.Dataset('/atch/raid1/zhangxq/Projects/narr_txla/txla_blk_narr_' + str(year) + '.nc')
+# Wind time period to use
+unitsWind = w.variables['time'].units
+datesWind = netCDF.num2date(w.variables['time'][:], unitsWind)
+##
+
+## River forcing ##
+r = netCDF.Dataset('/atch/raid1/zhangxq/Projects/txla_nesting6/TXLA_river_4dyes_2011.nc')
+# River timing
+unitsRiver = r.variables['river_time'].units
+datesRiver = netCDF.num2date(r.variables['river_time'][:], unitsRiver)
+tRiver = r.variables['river_time'][:]
+# all of river input
+Q = np.abs(r.variables['river_transport'][:]).sum(axis=1)*2.0/3.0
+# # start and end dates for river discharge
+# tstartRiver = netCDF.date2num(datetime(year, 1, 1, 0, 0, 0), unitsRiver)
+# tendRiver = netCDF.date2num(datetime(year+1, 1, 1, 0, 0, 0), unitsRiver)
+# start and end indices in time for river discharge
+itstartRiver = bisect.bisect_left(datesRiver, datetime(year, 1, 1, 0, 0, 0))
+itendRiver = bisect.bisect_left(datesRiver, datetime(year+1, 1, 1, 0, 0, 0))
 ##
 
     # # Change axis and label color
@@ -67,31 +93,37 @@ ticks = [int(tick) for tick in levels[ilevels]] # plot ticks
 
 
 # Loop through times that simulations were started
-for t in ts:
+for plotdate in plotdates:
+# for t in ts:
 
     # Set up before plotting
-    itmodel = find(t==m.variables['ocean_time'][:])[0] # index for model output at this time
+    itmodel = bisect.bisect_left(datesModel, plotdate) # index for model output at this time
+    itwind = bisect.bisect_left(datesWind, plotdate) # index for wind at this time
+    itriver = bisect.bisect_left(datesRiver, plotdate) # index for river at this time
+    # itmodel = find(plotdate>=datesModel)[0] # index for model output at this time
+    # itwind = find(plotdate>=datesWind)[0] # index for model output at this time
+    # itwind = find(t==w.variables['ocean_time'][:])[0] # index for model output at this time
 
-    figname = 'figures/' + str(year) + '/' + dates[itmodel].isoformat()[0:13] + '.png'
+    figname = 'figures/' + str(year) + '/' + datesModel[itmodel].isoformat()[0:13] + '.png'
 
     # Don't redo plot
     if os.path.exists(figname):
         continue
 
     # Set up plot
-    fig = plt.figure(figsize=(10.24, 4.3), dpi=100)
-    ax = fig.add_axes([0.065, 0.045, 0.925, 0.96])
+    fig = plt.figure(figsize=(10.24, 5.3), dpi=100)
+    ax = fig.add_axes([0.065, 0.145, 0.925, 0.86])
     # ax = fig.add_subplot(111)
     ax.set_frame_on(False) # kind of like it without the box
     tracpy.plotting.background(grid=grid, ax=ax, outline=False, mers=np.arange(-97, -88))
 
     # Date
-    date = dates[itmodel].strftime('%Y %b %02d %H:%M')
+    date = datesModel[itmodel].strftime('%Y %b %02d %H:%M')
     ax.text(0.7, 0.04, date, fontsize=20, color='0.2', transform=ax.transAxes, 
                 bbox=dict(facecolor='white', edgecolor='white', boxstyle='round'))
 
-    # # PONG
-    # ax.text(0.8, 0.95, 'PONG.TAMU.EDU', fontsize=14, transform=ax.transAxes, color='0.3')
+    # PONG
+    ax.text(0.8, 0.95, 'pong.tamu.edu', fontsize=14, transform=ax.transAxes, color='0.3')
 
     # Plot surface salinity
     # Note: skip ghost cells in x and y so that can properly plot grid cell boxes with pcolormesh
@@ -115,9 +147,39 @@ for t in ts:
     ax.pcolormesh(xr[172:189,332:341], yr[172:189,332:341], salt[172:189,332:341], cmap=cmap, vmin=0, vmax=36, zorder=2)
 
     # Mississippi river discharge rate
-
+    pdb.set_trace()
+    axr = fig.add_axes([0, 0, 0.77, .2])
+    axr.set_frame_on(False) # kind of like it without the box
+    axr.fill(tRiver[itriver], Q[itriver], alpha=0.5, fc='b', ec='k')
+    axr.plot(tRiver[itstartRiver:itendRiver], Q[itstartRiver:itendRiver], '-k')
+    axr.plot([tRiver[itstartRiver], tRiver[itendRiver]], [10000, 10000], '-b', lw=0.5, alpha=0.5)
+    axr.plot([tRiver[itstartRiver], tRiver[itendRiver]], [20000, 20000], '-b', lw=0.5, alpha=0.5)
+    axr.plot([tRiver[itstartRiver], tRiver[itendRiver]], [30000, 30000], '-b', lw=0.5, alpha=0.5)
 
     # Wind for several days
+    Uwind = w.variables['Uwind'][itwind-5:itwind+1,40,570]
+    Vwind = w.variables['Vwind'][itwind-5:itwind+1,40,570]
+    axw = fig.add_axes([0.8, 0, 0.2, .2])
+    axw.set_frame_on(False) # kind of like it without the box
+    # Plot wind arrow
+    # NEED UNITS TO BE IN KM OR SAME FOR RADIUS
+    axw.quiver(0.0, 0.0, Uwind[-1], Vwind[-1], 
+                   scale=100.0, pivot='middle',
+                   zorder=1e35,
+                   width=0.01, headlength=3, headaxislength=2.7,
+                   color=(0.0, 0.5, 1.0), clip_on=False)
+
+    # Plot leftover wind blobs
+    for iwind in xrange(Uwind.shape[0]-1):
+        axw.plot(0.1+Uwind[iwind], 0.1+Vwind[iwind], 'o', color=(0.5, 0.5, 1.0), alpha=0.01, mec=None)
+
+    # Plot bulls eye
+    for radius in [5, 10, 15]:
+        circ = plt.Circle((0.0, 0.0), radius*3500.0, ec=(0.8, 0.8, 1.0), fc='None')
+        axw.add_artist(circ)
+
+    axw.set_xlim(-1,1); axw.set_ylim(-1,1)
+
 
     # Colorbar in upper left corner
     cax = fig.add_axes([0.085, 0.925, 0.35, 0.03]) #colorbar axes

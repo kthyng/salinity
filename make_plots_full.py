@@ -54,6 +54,11 @@ ilevels = [0,1,2,3,4,5,8] # which levels to label
 ticks = [int(tick) for tick in levels[ilevels]] # plot ticks
 ##
 
+## Wind forcing ##
+
+
+
+
     # # Change axis and label color
     # ax.spines['bottom'].set_color('0.2')
     # ax.spines['top'].set_color('0.2')
@@ -118,8 +123,9 @@ for t in ts:
 
     
     # Wind for several days
-    Uwind = m.variables['Uwind'][:]
-    Vwind = m.variables['Vwind'][:]
+    pdb.set_trace()
+    Uwind = m.variables['Uwind'][itmodel,:,:]
+    Vwind = m.variables['Vwind'][itmodel,:,:]
 
 
     # Colorbar in upper left corner
