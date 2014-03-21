@@ -165,7 +165,7 @@ for plotdate in plotdates:
     axr.get_xaxis().set_visible(False)
     # label month ticks
     for i in xrange(len(mticks)):
-        axr.text(tRiver[mticks[i]], 50, mticknames[i], fontsize=9, color='0.2')
+        axr.text(tRiver[mticks[i]], 200, mticknames[i], fontsize=9, color='0.2')
 
     # Wind over the domain
     Uwind = w.variables['Uwind'][itwind,:,:]
