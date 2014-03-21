@@ -105,7 +105,7 @@ for plotdate in plotdates:
 
     # Set up plot
     fig = plt.figure(figsize=(10.1, 4.2), dpi=100)
-    ax = fig.add_axes([0.04, 0.05, 0.97, 0.88])
+    ax = fig.add_axes([0.04, 0.04, 0.97, 0.88])
     ax.set_frame_on(False) # kind of like it without the box
     tracpy.plotting.background(grid=grid, ax=ax, outline=False, mers=np.arange(-97, -88), merslabels=[0, 0, 1, 0])
 
@@ -141,7 +141,7 @@ for plotdate in plotdates:
     # ax.pcolormesh(xpsi[172:189,332:341], ypsi[172:189,332:341], salt[172:189,332:341], cmap=cmap, vmin=0, vmax=36, zorder=2)
 
     # Mississippi river discharge rate
-    axr = fig.add_axes([0.5, 0.04, 0.48, .13])
+    axr = fig.add_axes([0.5, 0.05, 0.48, .13])
     axr.set_frame_on(False) # kind of like it without the box
     axr.fill_between(tRiver[itstartRiver:itriver+1], Q[itstartRiver:itriver+1], alpha=0.5, facecolor='0.4', edgecolor='0.4')
     axr.plot(tRiver[itstartRiver:itendRiver+1], Q[itstartRiver:itendRiver+1], '-', color='0.4')
