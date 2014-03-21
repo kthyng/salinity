@@ -18,7 +18,7 @@ import bisect
 from matplotlib import delaunay
 
 # mpl.rcParams['text.usetex'] = True
-mpl.rcParams.update({'font.size': 16})
+mpl.rcParams.update({'font.size': 14})
 mpl.rcParams['font.sans-serif'] = 'Arev Sans, Bitstream Vera Sans, Lucida Grande, Verdana, Geneva, Lucid, Helvetica, Avant Garde, sans-serif'
 mpl.rcParams['mathtext.fontset'] = 'custom'
 mpl.rcParams['mathtext.cal'] = 'cursive'
@@ -32,7 +32,7 @@ mpl.rcParams['mathtext.fallback_to_cm'] = 'True'
 # Grid info
 loc = 'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_nesting6.nc'
 grid = tracpy.inout.readgrid(loc, llcrnrlat=27.01, 
-        urcrnrlat=30.6, llcrnrlon=-97.8, urcrnrlon=-87.7)
+        urcrnrlat=30.5, llcrnrlon=-97.8, urcrnrlon=-87.7)
 # actually using psi grid here despite the name
 xpsi = np.asanyarray(grid['xpsi'].T, order='C')
 ypsi = np.asanyarray(grid['ypsi'].T, order='C')
@@ -86,6 +86,7 @@ itstartRiver = bisect.bisect_left(datesRiver, datetime(year, 1, 1, 0, 0, 0))
 itendRiver = bisect.bisect_left(datesRiver, datetime(year+1, 1, 1, 0, 0, 0))
 # ticks for months on river discharge
 mticks = [bisect.bisect_left(datesRiver, monthdate) for monthdate in np.asarray(monthdates)]
+mticknames = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D']
 ##
 
 # Loop through times that simulations were started
@@ -103,8 +104,8 @@ for plotdate in plotdates:
     #     continue
 
     # Set up plot
-    fig = plt.figure(figsize=(10.24, 4.3), dpi=100)
-    ax = fig.add_axes([0.04, 0.08, 0.97, 0.88])
+    fig = plt.figure(figsize=(10.1, 4.2), dpi=100)
+    ax = fig.add_axes([0.04, 0.04, 0.97, 0.88])
     ax.set_frame_on(False) # kind of like it without the box
     tracpy.plotting.background(grid=grid, ax=ax, outline=False, mers=np.arange(-97, -88), merslabels=[0, 0, 1, 0])
 
@@ -112,7 +113,7 @@ for plotdate in plotdates:
     date = datesModel[itmodel].strftime('%Y %b %02d %H:%M')
     # greyfont = plt.matplotlib.font_manager.FontProperties() # grab default font properties
     # greyfont.set_color('')
-    ax.text(0.77, 0.175, date, fontsize=16, color='0.2', transform=ax.transAxes, 
+    ax.text(0.77, 0.185, date, fontsize=14, color='0.2', transform=ax.transAxes, 
                 bbox=dict(facecolor='white', edgecolor='white', boxstyle='round'))
 
     # # PONG
@@ -122,54 +123,65 @@ for plotdate in plotdates:
     # Note: skip ghost cells in x and y so that can properly plot grid cell boxes with pcolormesh
     salt = np.squeeze(m.variables['salt'][itmodel,-1,1:-1,1:-1])
     mappable = ax.pcolormesh(xpsi, ypsi, salt, cmap=cmap, vmin=0, vmax=36)
-    # Plot Sabine too, which gets covered by the basemap
-    sabmask = ~salt[172:189,332:341].mask.astype(bool)
-    sabmask[3,2] = False
-    sabmask[3,3] = False
-    sabmask[4,1] = False
-    sabmask[4,2] = False
-    sabmask[5,0] = False
-    sabmask[5,1] = False
-    sabmask[6,0] = False
-    sabmask[4,7] = False
-    sabmask[8:14,4] = False
-    sabmask[15,7] = False
-    sabmask[16,7] = False
-    sabmask[3:5,5:7] = False
-    salt[172:189,332:341] = np.ma.masked_where(~sabmask,salt[172:189,332:341])
-    ax.pcolormesh(xpsi[172:189,332:341], ypsi[172:189,332:341], salt[172:189,332:341], cmap=cmap, vmin=0, vmax=36, zorder=2)
+    # # Plot Sabine too, which gets covered by the basemap
+    # sabmask = ~salt[172:189,332:341].mask.astype(bool)
+    # sabmask[3,2] = False
+    # sabmask[3,3] = False
+    # sabmask[4,1] = False
+    # sabmask[4,2] = False
+    # sabmask[5,0] = False
+    # sabmask[5,1] = False
+    # sabmask[6,0] = False
+    # sabmask[4,7] = False
+    # sabmask[8:14,4] = False
+    # sabmask[15,7] = False
+    # sabmask[16,7] = False
+    # sabmask[3:5,5:7] = False
+    # salt[172:189,332:341] = np.ma.masked_where(~sabmask,salt[172:189,332:341])
+    # ax.pcolormesh(xpsi[172:189,332:341], ypsi[172:189,332:341], salt[172:189,332:341], cmap=cmap, vmin=0, vmax=36, zorder=2)
 
     # Mississippi river discharge rate
-    axr = fig.add_axes([0.5, 0.08, 0.48, .13])
+    axr = fig.add_axes([0.5, 0.04, 0.48, .13])
     axr.set_frame_on(False) # kind of like it without the box
     axr.fill_between(tRiver[itstartRiver:itriver+1], Q[itstartRiver:itriver+1], alpha=0.5, facecolor='0.4', edgecolor='0.4')
     axr.plot(tRiver[itstartRiver:itendRiver+1], Q[itstartRiver:itendRiver+1], '-', color='0.4')
+    axr.plot([tRiver[itstartRiver], tRiver[itendRiver]], [1, 1], '-', color='0.6', lw=0.5, alpha=0.5)
     axr.plot([tRiver[itstartRiver], tRiver[itendRiver]], [10000, 10000], '-', color='0.6', lw=0.5, alpha=0.5)
     axr.plot([tRiver[itstartRiver], tRiver[itendRiver]], [20000, 20000], '-', color='0.6', lw=0.5, alpha=0.5)
     axr.plot([tRiver[itstartRiver], tRiver[itendRiver]], [30000, 30000], '-', color='0.6', lw=0.5, alpha=0.5)
     # labels
-    axr.text(tRiver[mticks[-3]]+16.5, 20000, '20000', fontsize=10, color='0.2')
-    axr.text(tRiver[mticks[-3]]+15, 30000, r'30000 m$^3$s$^{-1}$', fontsize=10, color='0.2')
-    axr.text(tRiver[mticks[-7]]+15, 30000, 'Mississippi discharge', fontsize=10, color='0.2')
+    axr.text(tRiver[mticks[-3]]+16.5, 1, '0', fontsize=8, color='0.3')
+    axr.text(tRiver[mticks[-3]]+16.5, 10000, '10000', fontsize=8, color='0.3')
+    axr.text(tRiver[mticks[-3]]+16.5, 20000, '20000', fontsize=8, color='0.3')
+    axr.text(tRiver[mticks[-3]]+15, 30000, r'30000 m$^3$s$^{-1}$', fontsize=8, color='0.3')
+    axr.text(tRiver[mticks[-7]]+15, 30000, 'Mississippi discharge', fontsize=8, color='0.3')
     # ticks
-    axr.get_xaxis().set_ticklabels([])
-    axr.xaxis.set_ticks_position('bottom')
+    # axr.get_xaxis().set_ticklabels([])
+    # axr.xaxis.set_ticks_position('bottom')
     # add ticks for each month
-    axr.set_xticks(tRiver[mticks])
-    axr.tick_params('x', width=1.5, color='0.4') # make ticks bigger
+    # axr.set_xticks(tRiver[mticks])
+    # axr.tick_params('x', width=1.5, color='0.4') # make ticks bigger
     axr.get_yaxis().set_visible(False)
+    axr.get_xaxis().set_visible(False)
+    # label month ticks
+    for i in xrange(len(mticks)):
+        axr.text(tRiver[mticks[i]], 0.1, mticknames[i], fontsize=9, color='0.2')
 
     # Wind over the domain
     Uwind = w.variables['Uwind'][itwind,:,:]
     Vwind = w.variables['Vwind'][itwind,:,:]
-    ax.quiver(xr[::wdy,::wdx], yr[::wdy,::wdx], Uwind[::wdy,::wdx], Vwind[::wdy,::wdx], color='0.4', alpha=0.5)
+    Q = ax.quiver(xr[::wdy,::wdx], yr[::wdy,::wdx], Uwind[::wdy,::wdx], Vwind[::wdy,::wdx], color='0.4', alpha=0.5)
+    qk = ax.quiverkey(Q, 0.15, 0.65, 5, r'5m s$^{-1}$')#, fontcolor='0.2')# fontproperties={'color': '0.2'})
 
     # Colorbar in upper left corner
-    cax = fig.add_axes([0.11, 0.88, 0.35, 0.03]) #colorbar axes
+    cax = fig.add_axes([0.09, 0.85, 0.35, 0.03]) #colorbar axes
     cb = fig.colorbar(mappable, cax=cax, orientation='horizontal')
-    cb.set_label(r'Surface salinity [g$\cdot$kg$^{-1}$]', fontsize=16)
-    cb.ax.tick_params(labelsize=14, length=2) 
+    cb.set_label(r'Surface salinity [g$\cdot$kg$^{-1}$]', fontsize=14, color='0.2')
+    cb.ax.tick_params(labelsize=14, length=2, color='0.2', labelcolor='0.2') 
     cb.set_ticks(ticks)
+    # change colorbar tick color http://stackoverflow.com/questions/9662995/matplotlib-change-title-and-colorbar-text-and-tick-colors
+    cbtick = plt.getp(cb.ax.axes, 'yticklabels')
+    plt.setp(cbtick, color='0.2')
     pdb.set_trace()
 
     plt.savefig(figname)
