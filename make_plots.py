@@ -105,7 +105,7 @@ for plotdate in plotdates:
 
     # Set up plot
     fig = plt.figure(figsize=(10.1, 4.2), dpi=100)
-    ax = fig.add_axes([0.04, 0.04, 0.97, 0.88])
+    ax = fig.add_axes([0.04, 0.05, 0.97, 0.88])
     ax.set_frame_on(False) # kind of like it without the box
     tracpy.plotting.background(grid=grid, ax=ax, outline=False, mers=np.arange(-97, -88), merslabels=[0, 0, 1, 0])
 
@@ -145,16 +145,16 @@ for plotdate in plotdates:
     axr.set_frame_on(False) # kind of like it without the box
     axr.fill_between(tRiver[itstartRiver:itriver+1], Q[itstartRiver:itriver+1], alpha=0.5, facecolor='0.4', edgecolor='0.4')
     axr.plot(tRiver[itstartRiver:itendRiver+1], Q[itstartRiver:itendRiver+1], '-', color='0.4')
-    axr.plot([tRiver[itstartRiver], tRiver[itendRiver]], [1, 1], '-', color='0.6', lw=0.5, alpha=0.5)
+    axr.plot([tRiver[itstartRiver], tRiver[itendRiver]], [5, 5], '-', color='0.6', lw=0.5, alpha=0.5)
     axr.plot([tRiver[itstartRiver], tRiver[itendRiver]], [10000, 10000], '-', color='0.6', lw=0.5, alpha=0.5)
     axr.plot([tRiver[itstartRiver], tRiver[itendRiver]], [20000, 20000], '-', color='0.6', lw=0.5, alpha=0.5)
     axr.plot([tRiver[itstartRiver], tRiver[itendRiver]], [30000, 30000], '-', color='0.6', lw=0.5, alpha=0.5)
     # labels
-    axr.text(tRiver[mticks[-3]]+16.5, 1, '0', fontsize=8, color='0.3')
-    axr.text(tRiver[mticks[-3]]+16.5, 10000, '10000', fontsize=8, color='0.3')
-    axr.text(tRiver[mticks[-3]]+16.5, 20000, '20000', fontsize=8, color='0.3')
-    axr.text(tRiver[mticks[-3]]+15, 30000, r'30000 m$^3$s$^{-1}$', fontsize=8, color='0.3')
-    axr.text(tRiver[mticks[-7]]+15, 30000, 'Mississippi discharge', fontsize=8, color='0.3')
+    axr.text(tRiver[mticks[-3]]+16.5, 5, '0', fontsize=8, color='0.4')
+    axr.text(tRiver[mticks[-3]]+16.5, 10000, '10000', fontsize=8, color='0.4')
+    axr.text(tRiver[mticks[-3]]+16.5, 20000, '20000', fontsize=8, color='0.4')
+    axr.text(tRiver[mticks[-3]]+15, 30000, r'30000 m$^3$s$^{-1}$', fontsize=8, color='0.4')
+    axr.text(tRiver[mticks[-7]]+15, 30000, 'Mississippi discharge', fontsize=8, color='0.4')
     # ticks
     # axr.get_xaxis().set_ticklabels([])
     # axr.xaxis.set_ticks_position('bottom')
@@ -165,7 +165,7 @@ for plotdate in plotdates:
     axr.get_xaxis().set_visible(False)
     # label month ticks
     for i in xrange(len(mticks)):
-        axr.text(tRiver[mticks[i]], 0.1, mticknames[i], fontsize=9, color='0.2')
+        axr.text(tRiver[mticks[i]], 5, mticknames[i], fontsize=9, color='0.2')
 
     # Wind over the domain
     Uwind = w.variables['Uwind'][itwind,:,:]
