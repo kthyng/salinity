@@ -45,7 +45,7 @@ m = netCDF.Dataset(loc)
 # Model time period to use
 units = m.variables['ocean_time'].units
 year = 2008
-starttime = netCDF.date2num(datetime(year, 5, 1, 0, 0, 0), units)
+starttime = netCDF.date2num(datetime(year, 6, 24, 0, 0, 0), units)
 endtime = netCDF.date2num(datetime(year, 10, 1, 12, 0, 0), units)
 dt = m.variables['ocean_time'][1] - m.variables['ocean_time'][0] # 4 hours in seconds
 ts = np.arange(starttime, endtime, dt)
@@ -141,20 +141,21 @@ for plotdate in plotdates:
     # ax.pcolormesh(xpsi[172:189,332:341], ypsi[172:189,332:341], salt[172:189,332:341], cmap=cmap, vmin=0, vmax=36, zorder=2)
 
     # Mississippi river discharge rate
-    axr = fig.add_axes([0.5, 0.05, 0.48, .13])
+    axr = fig.add_axes([0.5, 0.05, 0.48, .11])
     axr.set_frame_on(False) # kind of like it without the box
     axr.fill_between(tRiver[itstartRiver:itriver+1], Q[itstartRiver:itriver+1], alpha=0.5, facecolor='0.4', edgecolor='0.4')
-    axr.plot(tRiver[itstartRiver:itendRiver+1], Q[itstartRiver:itendRiver+1], '-', color='0.4')
+    axr.plot(tRiver[itstartRiver:itriver], Q[itstartRiver:itriver], '-', color='0.4')
+    axr.plot(tRiver[itriver:itendRiver+1], Q[itriver:itendRiver+1], '-', color='0.4', alpha=0.3)
     axr.plot([tRiver[itstartRiver], tRiver[itendRiver]], [5, 5], '-', color='0.6', lw=0.5, alpha=0.5)
     axr.plot([tRiver[itstartRiver], tRiver[itendRiver]], [10000, 10000], '-', color='0.6', lw=0.5, alpha=0.5)
     axr.plot([tRiver[itstartRiver], tRiver[itendRiver]], [20000, 20000], '-', color='0.6', lw=0.5, alpha=0.5)
     axr.plot([tRiver[itstartRiver], tRiver[itendRiver]], [30000, 30000], '-', color='0.6', lw=0.5, alpha=0.5)
     # labels
-    axr.text(tRiver[mticks[-3]]+16.5, 5, '0', fontsize=8, color='0.4')
-    axr.text(tRiver[mticks[-3]]+16.5, 10000, '10000', fontsize=8, color='0.4')
-    axr.text(tRiver[mticks[-3]]+16.5, 20000, '20000', fontsize=8, color='0.4')
-    axr.text(tRiver[mticks[-3]]+15, 30000, r'30000 m$^3$s$^{-1}$', fontsize=8, color='0.4')
-    axr.text(tRiver[mticks[-7]]+15, 30000, 'Mississippi discharge', fontsize=8, color='0.4')
+    axr.text(tRiver[mticks[-3]]+16.5, 5, '0', fontsize=8, color='0.4', alpha=0.7)
+    axr.text(tRiver[mticks[-3]]+16.5, 10000, '1', fontsize=8, color='0.4', alpha=0.7)
+    axr.text(tRiver[mticks[-3]]+16.5, 20000, '2', fontsize=8, color='0.4', alpha=0.7)
+    axr.text(tRiver[mticks[-3]]+15, 30000, r'$3\times10^4$ m$^3$s$^{-1}$', fontsize=8, color='0.4', alpha=0.7)
+    axr.text(tRiver[mticks[-7]]+15, 30000, 'Mississippi discharge', fontsize=10, color='0.2')
     # ticks
     # axr.get_xaxis().set_ticklabels([])
     # axr.xaxis.set_ticks_position('bottom')
@@ -171,7 +172,7 @@ for plotdate in plotdates:
     Uwind = w.variables['Uwind'][itwind,:,:]
     Vwind = w.variables['Vwind'][itwind,:,:]
     Q = ax.quiver(xr[::wdy,::wdx], yr[::wdy,::wdx], Uwind[::wdy,::wdx], Vwind[::wdy,::wdx], color='0.4', alpha=0.5)
-    qk = ax.quiverkey(Q, 0.15, 0.65, 5, r'5 m$\cdot$s$^{-1}$', labelcolor='0.2')
+    qk = ax.quiverkey(Q, 0.18, 0.65, 5, r'5 m$\cdot$s$^{-1}$ wind', labelcolor='0.2', fontproperties={'size': '10'})
 
     # Colorbar in upper left corner
     cax = fig.add_axes([0.09, 0.85, 0.35, 0.03]) #colorbar axes
