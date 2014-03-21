@@ -165,13 +165,13 @@ for plotdate in plotdates:
     axr.get_xaxis().set_visible(False)
     # label month ticks
     for i in xrange(len(mticks)):
-        axr.text(tRiver[mticks[i]], 200, mticknames[i], fontsize=9, color='0.2')
+        axr.text(tRiver[mticks[i]], 2500, mticknames[i], fontsize=9, color='0.2')
 
     # Wind over the domain
     Uwind = w.variables['Uwind'][itwind,:,:]
     Vwind = w.variables['Vwind'][itwind,:,:]
     Q = ax.quiver(xr[::wdy,::wdx], yr[::wdy,::wdx], Uwind[::wdy,::wdx], Vwind[::wdy,::wdx], color='0.4', alpha=0.5)
-    qk = ax.quiverkey(Q, 0.15, 0.65, 5, r'5m s$^{-1}$', labelcolor='0.2')
+    qk = ax.quiverkey(Q, 0.15, 0.65, 5, r'5 m$\cdot$s$^{-1}$', labelcolor='0.2')
 
     # Colorbar in upper left corner
     cax = fig.add_axes([0.09, 0.85, 0.35, 0.03]) #colorbar axes
