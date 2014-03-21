@@ -171,7 +171,7 @@ for plotdate in plotdates:
     Uwind = w.variables['Uwind'][itwind,:,:]
     Vwind = w.variables['Vwind'][itwind,:,:]
     Q = ax.quiver(xr[::wdy,::wdx], yr[::wdy,::wdx], Uwind[::wdy,::wdx], Vwind[::wdy,::wdx], color='0.4', alpha=0.5)
-    qk = ax.quiverkey(Q, 0.15, 0.65, 5, r'5m s$^{-1}$')#, fontcolor='0.2')# fontproperties={'color': '0.2'})
+    qk = ax.quiverkey(Q, 0.15, 0.65, 5, r'5m s$^{-1}$', labelcolor='0.2')
 
     # Colorbar in upper left corner
     cax = fig.add_axes([0.09, 0.85, 0.35, 0.03]) #colorbar axes
