@@ -32,7 +32,7 @@ mpl.rcParams['mathtext.sf'] = 'sans'
 mpl.rcParams['mathtext.fallback_to_cm'] = 'True'
 
 
-year = 2014
+year = 2012
 
 
 
@@ -116,9 +116,9 @@ Q1 = op.resize(Q1, 0)
 Q2 = np.abs(r2.variables['river_transport'][:]).sum(axis=1)*2.0/3.0
 # Combine river info into one dataset
 iend1 = find(datesr1<datetime(2012,1,1,0,0,0))[-1] # ending index for file 1
-tRiver = np.concatenate((tr1, tr2[:]), axis=0)
-datesRiver = np.concatenate((datesr1, datesr2))
-R = np.concatenate((Q1, Q2))
+tRiver = np.concatenate((tr1[:iend1], tr2[:]), axis=0)
+datesRiver = np.concatenate((datesr1[:iend1], datesr2))
+R = np.concatenate((Q1[:iend1], Q2))
 r1.close(); r2.close()
 # start and end indices in time for river discharge
 itstartRiver = bisect.bisect_left(datesRiver, datetime(year, 1, 1, 0, 0, 0))
