@@ -1,5 +1,5 @@
 '''
-Make salinity plots for movies of upper part of domain.
+Make salinity plots for movies of the full domain.
 '''
 
 import matplotlib as mpl
@@ -47,8 +47,7 @@ def rot2d(x, y, ang):
 # Grid info
 loc = 'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_nesting6.nc'
 grid_filename = '/atch/raid1/zhangxq/Projects/txla_nesting6/txla_grd_v4_new.nc'
-grid = tracpy.inout.readgrid(grid_filename, llcrnrlat=27.01, 
-        urcrnrlat=30.5, llcrnrlon=-97.8, urcrnrlon=-87.7, usebasemap=True)
+grid = tracpy.inout.readgrid(grid_filename, usebasemap=True)
 # actually using psi grid here despite the name
 xpsi = np.asanyarray(grid['xpsi'].T, order='C')
 ypsi = np.asanyarray(grid['ypsi'].T, order='C')
@@ -162,7 +161,7 @@ for plotdate in plotdates:
         continue
 
     # Set up plot
-    fig = plt.figure(figsize=(10.1, 4.2), dpi=100)
+    fig = plt.figure(figsize=(10.1, 6.2), dpi=100)
     ax = fig.add_axes([0.04, 0.04, 0.97, 0.88])
     ax.set_frame_on(False) # kind of like it without the box
     tracpy.plotting.background(grid=grid, ax=ax, outline=False, mers=np.arange(-97, -88), merslabels=[0, 0, 1, 0], pars=np.arange(28,31))
