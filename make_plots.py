@@ -18,6 +18,7 @@ from matplotlib.mlab import find
 import bisect
 from matplotlib import delaunay
 import op
+import cmocean
 
 # mpl.rcParams['text.usetex'] = True
 mpl.rcParams.update({'font.size': 14})
@@ -32,11 +33,19 @@ mpl.rcParams['mathtext.sf'] = 'sans'
 mpl.rcParams['mathtext.fallback_to_cm'] = 'True'
 
 
-year = 2012
+year = 2014
 
+
+
+def rot2d(x, y, ang):
+    '''rotate vectors by geometric angle'''
+    xr = x*np.cos(ang) - y*np.sin(ang)
+    yr = x*np.sin(ang) + y*np.cos(ang)
+    return xr, yr
 
 
 # Grid info
+loc = 'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_nesting6.nc'
 grid_filename = '/atch/raid1/zhangxq/Projects/txla_nesting6/txla_grd_v4_new.nc'
 grid = tracpy.inout.readgrid(grid_filename, llcrnrlat=27.01, 
         urcrnrlat=30.5, llcrnrlon=-97.8, urcrnrlon=-87.7, usebasemap=True)
@@ -46,12 +55,17 @@ ypsi = np.asanyarray(grid['ypsi'].T, order='C')
 xr = np.asanyarray(grid['xr'].T, order='C')
 yr = np.asanyarray(grid['yr'].T, order='C')
 
+# to rotate wind vectors
+m = netCDF.Dataset(loc)
+anglev = m.variables['angle'][:]
+# w = m  # this is to use the surface wind stress for wind arrows instead of wind velocities from the forcing files
+
 ## Model output ##
-if year <= 2013:
-    currents_filenames = np.sort(glob.glob('/home/kthyng/shelf/' + str(year) + '/ocean_his_????.nc'))
-elif year == 2014:
-    currents_filenames = np.sort(glob.glob('/home/kthyng/shelf/' + str(year) + '/ocean_his_??.nc'))
-m = netCDF.MFDataset(currents_filenames)
+# if year <= 2013:
+#     currents_filenames = np.sort(glob.glob('/home/kthyng/shelf/' + str(year) + '/ocean_his_????.nc'))
+# elif year == 2014:
+#     currents_filenames = np.sort(glob.glob('/home/kthyng/shelf/' + str(year) + '/ocean_his_??.nc'))
+# m = netCDF.MFDataset(currents_filenames)
 
 # Model time period to use
 units = m.variables['ocean_time'].units
@@ -76,7 +90,8 @@ else:
 
 # Colormap for model output
 levels = (37-np.exp(np.linspace(0,np.log(36.), 10)))[::-1]-1 # log for salinity
-cmap = cmPong.salinity('YlGnBu_r', levels)
+cmap = cmPong.salinity(cmocean.cm.salt, levels)
+# cmap = cmPong.salinity('YlGnBu_r', levels)
 ilevels = [0,1,2,3,4,5,8] # which levels to label
 ticks = [int(tick) for tick in levels[ilevels]] # plot ticks
 ##
@@ -95,6 +110,7 @@ elif year == 2014:
 # Wind time period to use
 unitsWind = (w.variables['time'].units).replace('/','-')
 datesWind = netCDF.num2date(w.variables['time'][:], unitsWind)
+# datesWind = datesModel
 wdx = 25; wdy = 30 # in indices
 ##
 
@@ -219,6 +235,13 @@ for plotdate in plotdates:
     Q = ax.quiver(xr[wdy::wdy,wdx::wdx], yr[wdy::wdy,wdx::wdx], Uwind[wdy::wdy,wdx::wdx], Vwind[wdy::wdy,wdx::wdx], 
             color='k', alpha=0.1, scale=400, pivot='middle', headlength=3, headaxislength=2.8)
     qk = ax.quiverkey(Q, 0.18, 0.65, 10, r'10 m$\cdot$s$^{-1}$ wind', labelcolor='0.2', fontproperties={'size': '10'})
+
+    # sustr = w.variables['sustr'][itwind,:,:]
+    # svstr = w.variables['svstr'][itwind,:,:]
+    # sustr, svstr = rot2d(op.resize(sustr,1)[1:-1,:], op.resize(svstr,0)[:,1:-1], anglev[1:-1, 1:-1])
+    # Q = ax.quiver(xr[wdy+1::wdy,wdx+1::wdx], yr[wdy+1::wdy,wdx+1::wdx], sustr[wdy::wdy,wdx::wdx], svstr[wdy::wdy,wdx::wdx], 
+    #         color='k', alpha=0.1, scale=4, pivot='middle', headlength=3, headaxislength=2.8)
+    # qk = ax.quiverkey(Q, 0.18, 0.65, 0.1, label=r'0.1 N m$^{2}$', labelcolor='0.2', fontproperties={'size': '10'})
 
     # Colorbar in upper left corner
     cax = fig.add_axes([0.09, 0.85, 0.35, 0.03]) #colorbar axes
