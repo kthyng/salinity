@@ -79,6 +79,8 @@ dt = m.variables['ocean_time'][1] - m.variables['ocean_time'][0] # 4 hours in se
 ts = np.arange(starttime, endtime, dt)
 itshift = find(starttime==m.variables['ocean_time'][:]) # shift to get to the right place in model output
 datesModel = netCDF.num2date(m.variables['ocean_time'][:], units)
+# current arrows
+cdx = 7; cdy = 11 # in indices
 
 plotdates = netCDF.num2date(ts, units)
 if year == 2014:
@@ -112,7 +114,7 @@ elif year == 2014:
 unitsWind = (w.variables['time'].units).replace('/','-')
 datesWind = netCDF.num2date(w.variables['time'][:], unitsWind)
 # datesWind = datesModel
-wdx = 22; wdy = 30 # in indices
+wdx = 18; wdy = 30 # in indices
 ##
 
 ## River forcing ##
@@ -232,12 +234,21 @@ for plotdate in plotdates:
         axr.text(tRiver[mticks[i]], 2500, mticknames[i], fontsize=9, color='0.2')
     axr.add_patch( patches.Rectangle( (0.3, 0.01), 0.7, 0.2, transform=ax.transAxes, color='white', zorder=1))    
 
+    # Surface currents over domain, use psi grid for common locations
+    u = op.resize(np.squeeze(m.variables['u'][itmodel,-1,:,:]), 0)
+    v = op.resize(np.squeeze(m.variables['v'][itmodel,-1,:,:]), 1)
+    Q = ax.quiver(xpsi[cdy::cdy,cdx::cdx], ypsi[cdy::cdy,cdx::cdx], u[cdy::cdy,cdx::cdx], v[cdy::cdy,cdx::cdx], 
+            color='k', alpha=0.35, pivot='middle', scale=40, minlength=0.1)
+    # Q = ax.quiver(xpsi[cdy::cdy,cdy::cdy], ypsi[cdy::cdy,cdy::cdy], Uwind[cdy::cdy,cdy::cdy], Vwind[cdy::cdy,cdy::cdy], 
+    #         color='k', alpha=0.1, scale=400, pivot='middle', headlength=3, headaxislength=2.8)
+    qk = ax.quiverkey(Q, 0.18, 0.775, 0.5, r'0.5 m$\cdot$s$^{-1}$ current', labelcolor='0.2', fontproperties={'size': '10'})
+
     # Wind over the domain
     Uwind = w.variables['Uwind'][itwind,:,:]
     Vwind = w.variables['Vwind'][itwind,:,:]
     Q = ax.quiver(xr[wdy::wdy,wdx::wdx], yr[wdy::wdy,wdx::wdx], Uwind[wdy::wdy,wdx::wdx], Vwind[wdy::wdy,wdx::wdx], 
             color='k', alpha=0.1, scale=400, pivot='middle', headlength=3, headaxislength=2.8)
-    qk = ax.quiverkey(Q, 0.18, 0.8, 10, r'10 m$\cdot$s$^{-1}$ wind', labelcolor='0.2', fontproperties={'size': '10'})
+    qk = ax.quiverkey(Q, 0.18, 0.85, 10, r'10 m$\cdot$s$^{-1}$ wind', labelcolor='0.2', fontproperties={'size': '10'})
 
     # sustr = w.variables['sustr'][itwind,:,:]
     # svstr = w.variables['svstr'][itwind,:,:]
