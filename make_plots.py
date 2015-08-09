@@ -229,9 +229,10 @@ for plotdate in plotdates:
     for i in xrange(len(mticks)):
         axr.text(tRiver[mticks[i]], 2500, mticknames[i], fontsize=9, color='0.2')
 
-    # Wind over the domain
+    # Wind over the domain. These winds need to be rotated.
     Uwind = w.variables['Uwind'][itwind,:,:]
     Vwind = w.variables['Vwind'][itwind,:,:]
+    Uwind, Vwind = rot2d(Uwind, Vwind, anglev)
     Q = ax.quiver(xr[wdy::wdy,wdx::wdx], yr[wdy::wdy,wdx::wdx], Uwind[wdy::wdy,wdx::wdx], Vwind[wdy::wdy,wdx::wdx], 
             color='k', alpha=0.1, scale=400, pivot='middle', headlength=3, headaxislength=2.8)
     qk = ax.quiverkey(Q, 0.18, 0.65, 10, r'10 m$\cdot$s$^{-1}$ wind', labelcolor='0.2', fontproperties={'size': '10'})
